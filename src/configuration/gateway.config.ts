@@ -2,6 +2,7 @@ import { RemoteGraphQLDataSource } from '@apollo/gateway/dist/datasources';
 import { ConfigService } from '@nestjs/config';
 import { GraphQLRequest, GraphQLResponse } from 'apollo-server-types';
 import { sign, verify } from 'jsonwebtoken';
+import { AuthService } from '../app/auth/auth.service';
 export interface IContext {
   jwt: string;
 }
@@ -14,6 +15,7 @@ export class AuthenticatedDataSource extends RemoteGraphQLDataSource {
   constructor(
     private readonly options: Record<string, unknown>,
     private readonly configService: ConfigService,
+    private readonly authService: AuthService,
   ) {
     super(options);
   }
@@ -25,11 +27,12 @@ export class AuthenticatedDataSource extends RemoteGraphQLDataSource {
     request: GraphQLRequest;
     context: IContext;
   }): Promise<void> {
-    const payload: unknown = context.jwt
-      ? verify(context.jwt, this.configService.get<string>('jwt.secret'))
-      : { sub: '' };
+    const payload = this.getPayloadOrPayloadDefault(context);
+
+    const { scopes } = await this.getUserScopesOrScopesDefault(payload);
 
     request.http.headers.set('x-user-id', payload['sub']);
+    request.http.headers.set('x-user-scopes', scopes.join(','));
   }
 
   async didReceiveResponse({
@@ -47,6 +50,22 @@ export class AuthenticatedDataSource extends RemoteGraphQLDataSource {
 
     return response;
   }
+
+  private getPayloadOrPayloadDefault(context: IContext) {
+    return context.jwt
+      ? verify(context.jwt, this.configService.get<string>('jwt.secret'))
+      : { sub: '' };
+  }
+
+  private async getUserScopesOrScopesDefault(
+    payload: Record<string, any> | string,
+  ) {
+    return payload['sub'] !== ''
+      ? await this.authService.searchUserScopes({
+          _id: payload['sub'],
+        })
+      : { scopes: [] };
+  }
 }
 
 export const gatewayConfigFactory = async (configService: ConfigService) => ({
@@ -60,7 +79,6 @@ export const gatewayConfigFactory = async (configService: ConfigService) => ({
       jwt: req.headers.authorization
         ? req.headers.authorization.replace('Bearer ', '')
         : null,
-      cors: configService.get('apolloServer.cors'),
     }),
   },
 });

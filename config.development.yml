@@ -1,6 +1,8 @@
 app:
   prefix: '/graphql'
   port: 3000
+  referrerPolicy: false
+  contentSecurityPolicy: false
 
 services:
   - name: 'users-graphql'
@@ -14,5 +16,5 @@ apollo:
   # key: 'service:app-nest-knv8p1:gMZOWfrZQ8RsSZTr6J3V8w'
   key:
 
-apolloServer:
-  cors: true
+auth:
+  url: 'http://localhost:3005'

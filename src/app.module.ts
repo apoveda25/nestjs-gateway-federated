@@ -4,6 +4,7 @@ import { GATEWAY_BUILD_SERVICE, GraphQLGatewayModule } from '@nestjs/graphql';
 import configuration from './configuration/app.config';
 import { ConfigurationModule } from './configuration/configuration.module';
 import { gatewayConfigFactory } from './configuration/gateway.config';
+import { AuthModule } from './app/auth/auth.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { gatewayConfigFactory } from './configuration/gateway.config';
       useFactory: gatewayConfigFactory,
     }),
     ConfigurationModule,
+    AuthModule,
   ],
 })
 export class AppModule {}

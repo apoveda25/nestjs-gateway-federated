@@ -18,6 +18,12 @@ class AppVariables {
   @Min(1024)
   @Max(49151)
   port: number;
+
+  @IsBoolean()
+  referrerPolicy: boolean;
+
+  @IsBoolean()
+  contentSecurityPolicy: boolean;
 }
 
 class ServiceVariable {
@@ -42,11 +48,6 @@ class ApolloVariables {
   key?: string;
 }
 
-class ApolloServerVariables {
-  @IsBoolean()
-  cors: boolean;
-}
-
 class EnvironmentVariables {
   @ValidateNested({ each: true })
   app: AppVariables;
@@ -59,9 +60,6 @@ class EnvironmentVariables {
 
   @ValidateNested({ each: true })
   apollo: ApolloVariables;
-
-  @ValidateNested({ each: true })
-  apolloServer: ApolloServerVariables;
 }
 
 export function validate(config: Record<string, unknown>) {

@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package auth;
+
+service AuthService {
+  rpc searchUserScopes (UserId) returns (Scopes) {}
+}
+
+message UserId {
+  string _id = 1;
+}
+
+message Scope {
+  string _id = 1;
+  string _key = 2;
+  string name = 3;
+  string action = 4;
+  string collection = 5;
+}
+
+message Scopes {
+  repeated Scope scopes = 1;
+}

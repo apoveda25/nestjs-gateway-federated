@@ -1,10 +1,6 @@
-import {
-  Inject,
-  Injectable,
-  InternalServerErrorException,
-  OnModuleInit,
-} from '@nestjs/common';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
+import { GraphQLError } from 'graphql';
 import {
   IAuthServiceGrpc,
   ISearchUserScopes,
@@ -29,7 +25,7 @@ export class AuthService implements OnModuleInit {
         .toPromise();
     } catch (error) {
       console.log(error);
-      throw new InternalServerErrorException();
+      throw new GraphQLError('Internal server error - Auth Service');
     }
   }
 }

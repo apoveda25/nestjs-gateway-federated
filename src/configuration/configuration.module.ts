@@ -26,7 +26,7 @@ import { AuthenticatedDataSource } from './gateway.config';
             authService,
           );
       },
-      inject: [AuthenticatedDataSource, ConfigService],
+      inject: [AuthenticatedDataSource, ConfigService, AuthService],
     },
   ],
   exports: [GATEWAY_BUILD_SERVICE],

@@ -1,8 +1,11 @@
 import { RemoteGraphQLDataSource } from '@apollo/gateway/dist/datasources';
 import { ConfigService } from '@nestjs/config';
 import { GraphQLRequest, GraphQLResponse } from 'apollo-server-types';
+import { GraphQLError } from 'graphql';
 import { sign, verify } from 'jsonwebtoken';
 import { AuthService } from '../app/auth/auth.service';
+import { IScopes } from '../app/auth/interfaces/auth-service.interface';
+
 export interface IContext {
   jwt: string;
 }
@@ -27,12 +30,17 @@ export class AuthenticatedDataSource extends RemoteGraphQLDataSource {
     request: GraphQLRequest;
     context: IContext;
   }): Promise<void> {
-    const payload = this.getPayloadOrPayloadDefault(context);
+    const payload = context.jwt ? this.getPayload(context) : { sub: '' };
 
-    const { scopes } = await this.getUserScopesOrScopesDefault(payload);
+    const { scopes } = context.jwt
+      ? await this.getUserScopes(payload)
+      : { scopes: [] };
 
     request.http.headers.set('x-user-id', payload['sub']);
-    request.http.headers.set('x-user-scopes', scopes.join(','));
+    request.http.headers.set(
+      'x-scopes',
+      scopes.map((scope) => scope.name).join(','),
+    );
   }
 
   async didReceiveResponse({
@@ -40,7 +48,7 @@ export class AuthenticatedDataSource extends RemoteGraphQLDataSource {
   }: {
     response: GraphQLResponse;
   }): Promise<GraphQLResponse> {
-    if (response.data.signIn) {
+    if (response?.data?.signIn) {
       response.data.signIn.token = sign(
         JSON.parse(response.data.signIn.token),
         this.configService.get<string>('jwt.secret'),
@@ -51,20 +59,16 @@ export class AuthenticatedDataSource extends RemoteGraphQLDataSource {
     return response;
   }
 
-  private getPayloadOrPayloadDefault(context: IContext) {
-    return context.jwt
-      ? verify(context.jwt, this.configService.get<string>('jwt.secret'))
-      : { sub: '' };
+  private getPayload(context: IContext) {
+    return verify(context.jwt, this.configService.get<string>('jwt.secret'));
   }
 
-  private async getUserScopesOrScopesDefault(
+  private async getUserScopes(
     payload: Record<string, any> | string,
-  ) {
-    return payload['sub'] !== ''
-      ? await this.authService.searchUserScopes({
-          _id: payload['sub'],
-        })
-      : { scopes: [] };
+  ): Promise<IScopes> {
+    return await this.authService.searchUserScopes({
+      _id: payload['sub'],
+    });
   }
 }
 
@@ -75,10 +79,15 @@ export const gatewayConfigFactory = async (configService: ConfigService) => ({
       : configService.get('services'),
   },
   server: {
-    context: ({ req }) => ({
-      jwt: req.headers.authorization
-        ? req.headers.authorization.replace('Bearer ', '')
-        : null,
-    }),
+    context: ({ req }) => {
+      if (!req.headers.authorization) return { jwt: null };
+
+      if (req.headers.authorization.includes('Bearer '))
+        return {
+          jwt: req.headers.authorization.replace('Bearer ', ''),
+        };
+
+      throw new GraphQLError('Token bearer is bad.');
+    },
   },
 });

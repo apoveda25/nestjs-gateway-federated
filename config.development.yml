@@ -17,4 +17,4 @@ apollo:
   key:
 
 auth:
-  url: 'http://localhost:3005'
+  url: 'localhost:3005'

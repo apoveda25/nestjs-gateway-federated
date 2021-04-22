@@ -3,7 +3,6 @@ import {
   IsBoolean,
   IsOptional,
   IsString,
-  IsUrl,
   Matches,
   Max,
   Min,
@@ -26,14 +25,6 @@ class AppVariables {
   contentSecurityPolicy: boolean;
 }
 
-class ServiceVariable {
-  @IsString()
-  name: string;
-
-  @IsUrl()
-  url: string;
-}
-
 class JWTVariables {
   @IsString()
   secret: string;
@@ -48,18 +39,26 @@ class ApolloVariables {
   key?: string;
 }
 
+class GatewayVariables {
+  @IsBoolean()
+  debug: boolean;
+
+  @IsBoolean()
+  serviceHealthCheck: boolean;
+}
+
 class EnvironmentVariables {
   @ValidateNested({ each: true })
   app: AppVariables;
-
-  @ValidateNested({ each: true })
-  services: ServiceVariable[];
 
   @ValidateNested({ each: true })
   jwt: JWTVariables;
 
   @ValidateNested({ each: true })
   apollo: ApolloVariables;
+
+  @ValidateNested({ each: true })
+  gateway: GatewayVariables;
 }
 
 export function validate(config: Record<string, unknown>) {

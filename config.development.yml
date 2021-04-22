@@ -4,17 +4,16 @@ app:
   referrerPolicy: false
   contentSecurityPolicy: false
 
-services:
-  - name: 'users-graphql'
-    url: 'http://localhost:3010/graphql'
-
 jwt:
   secret: 'd2d95aebfe77c50b4f2188f7e774ae41f3c3188609d173f7a59a2112fa6e31ac'
   expiresIn: '6h'
 
 apollo:
-  # key: 'service:app-nest-knv8p1:gMZOWfrZQ8RsSZTr6J3V8w'
-  key:
+  key: service:farmaco-graphql-dev:BNH2oVnswHQGhmebHcNSQQ
+
+gateway:
+  debug: true
+  serviceHealthCheck: false
 
 auth:
   url: 'localhost:3005'

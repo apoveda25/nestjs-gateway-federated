@@ -1,5 +1,6 @@
 import { RemoteGraphQLDataSource } from '@apollo/gateway/dist/datasources';
 import { ConfigService } from '@nestjs/config';
+import { GatewayModuleOptions } from '@nestjs/graphql';
 import { GraphQLRequest, GraphQLResponse } from 'apollo-server-types';
 import { GraphQLError } from 'graphql';
 import { sign, verify } from 'jsonwebtoken';
@@ -72,11 +73,12 @@ export class AuthenticatedDataSource extends RemoteGraphQLDataSource {
   }
 }
 
-export const gatewayConfigFactory = async (configService: ConfigService) => ({
+export const gatewayConfigFactory = async (
+  configService: ConfigService,
+): Promise<GatewayModuleOptions> => ({
   gateway: {
-    serviceList: configService.get('apollo.key')
-      ? []
-      : configService.get('services'),
+    debug: configService.get('gateway.debug'),
+    serviceHealthCheck: configService.get('gateway.serviceHealthCheck'),
   },
   server: {
     context: ({ req }) => {

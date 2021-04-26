@@ -49,7 +49,7 @@ export class AuthenticatedDataSource extends RemoteGraphQLDataSource {
   }: {
     response: GraphQLResponse;
   }): Promise<GraphQLResponse> {
-    if (response?.data?.signIn) {
+    if (response?.data?.signIn || response?.data?.login) {
       response.data.signIn.token = sign(
         JSON.parse(response.data.signIn.token),
         this.configService.get<string>('jwt.secret'),

@@ -57,6 +57,14 @@ export class AuthenticatedDataSource extends RemoteGraphQLDataSource {
       );
     }
 
+    if (response?.data?.login) {
+      response.data.login.token = sign(
+        JSON.parse(response.data.login.token),
+        this.configService.get<string>('jwt.secret'),
+        { expiresIn: this.configService.get<string>('jwt.expiresIn') },
+      );
+    }
+
     return response;
   }
 

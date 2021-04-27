@@ -9,7 +9,7 @@ jwt:
   expiresIn: '6h'
 
 apollo:
-  key: service:farmaco-graphql-51ak3d:5DpZCl3LJ-dEvfggMw12Rg
+  key: service:farmaco-graphql-51ak3d:eyCOxLniIshEQrOp0xyQKQ
 
 gateway:
   debug: true

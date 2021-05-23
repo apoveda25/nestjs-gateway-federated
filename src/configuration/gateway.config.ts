@@ -83,21 +83,28 @@ export class AuthenticatedDataSource extends RemoteGraphQLDataSource {
 
 export const gatewayConfigFactory = async (
   configService: ConfigService,
-): Promise<GatewayModuleOptions> => ({
-  gateway: {
+): Promise<GatewayModuleOptions> => {
+  const gateway = {
     debug: configService.get('gateway.debug'),
     serviceHealthCheck: configService.get('gateway.serviceHealthCheck'),
-  },
-  server: {
-    context: ({ req }) => {
-      if (!req.headers.authorization) return { jwt: null };
+  };
 
-      if (req.headers.authorization.includes('Bearer '))
-        return {
-          jwt: req.headers.authorization.replace('Bearer ', ''),
-        };
+  if (!configService.get('gateway.key'))
+    gateway['serviceList'] = configService.get('gateway.services');
 
-      throw new GraphQLError('Token bearer is bad.');
+  return {
+    gateway,
+    server: {
+      context: ({ req }) => {
+        if (!req.headers.authorization) return { jwt: null };
+
+        if (req.headers.authorization.includes('Bearer '))
+          return {
+            jwt: req.headers.authorization.replace('Bearer ', ''),
+          };
+
+        throw new GraphQLError('Token bearer is bad.');
+      },
     },
-  },
-});
+  };
+};

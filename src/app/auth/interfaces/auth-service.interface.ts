@@ -1,21 +1,29 @@
 import { Observable } from 'rxjs';
 
-export interface ISearchUserScopes {
+export interface ISearchUser {
   _id: string;
+  active: boolean;
+  emailActive: boolean;
+  role: ISearchRole;
+  scopes: ISearchScope[];
 }
 
-export interface IScope {
+export interface ISearchRole {
+  _id: string;
+  _key: string;
+  level: number;
+}
+
+export interface ISearchScope {
   _id: string;
   _key: string;
   name: string;
-  action: string;
-  collection: string;
 }
 
-export interface IScopes {
-  scopes: IScope[];
+export interface IUserId {
+  _id: string;
 }
 
 export interface IAuthServiceGrpc {
-  searchUserScopes(data: ISearchUserScopes): Observable<IScopes>;
+  searchUserRoleScopes(userId: IUserId): Observable<ISearchUser>;
 }

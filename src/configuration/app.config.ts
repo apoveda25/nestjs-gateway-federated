@@ -17,7 +17,7 @@ export default () => {
 
   validate(config);
 
-  if (config.apollo.key) process.env.APOLLO_KEY = config.apollo.key;
+  if (config.gateway.key) process.env.APOLLO_KEY = config.gateway.key;
 
   return config;
 };

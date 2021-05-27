@@ -33,18 +33,34 @@ class JWTVariables {
   expiresIn: string;
 }
 
-class ApolloVariables {
+class ApolloServices {
+  @IsString()
+  name: string;
+
+  @IsString()
+  url: string;
+}
+
+// class ApolloVariables {
+//   @IsString()
+//   @IsOptional()
+//   key?: string;
+// }
+
+class GatewayVariables {
   @IsString()
   @IsOptional()
   key?: string;
-}
 
-class GatewayVariables {
   @IsBoolean()
   debug: boolean;
 
   @IsBoolean()
   serviceHealthCheck: boolean;
+
+  @ValidateNested({ each: true })
+  @IsOptional()
+  services?: ApolloServices[];
 }
 
 class EnvironmentVariables {
@@ -54,8 +70,8 @@ class EnvironmentVariables {
   @ValidateNested({ each: true })
   jwt: JWTVariables;
 
-  @ValidateNested({ each: true })
-  apollo: ApolloVariables;
+  // @ValidateNested({ each: true })
+  // apollo: ApolloVariables;
 
   @ValidateNested({ each: true })
   gateway: GatewayVariables;

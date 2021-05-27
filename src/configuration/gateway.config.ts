@@ -5,7 +5,7 @@ import { GraphQLRequest, GraphQLResponse } from 'apollo-server-types';
 import { GraphQLError } from 'graphql';
 import { sign, verify } from 'jsonwebtoken';
 import { AuthService } from '../app/auth/auth.service';
-import { IScopes } from '../app/auth/interfaces/auth-service.interface';
+import { ISearchUser } from '../app/auth/interfaces/auth-service.interface';
 
 export interface IContext {
   jwt: string;
@@ -33,14 +33,24 @@ export class AuthenticatedDataSource extends RemoteGraphQLDataSource {
   }): Promise<void> {
     const payload = context.jwt ? this.getPayload(context) : { sub: '' };
 
-    const { scopes } = context.jwt
-      ? await this.getUserScopes(payload)
-      : { scopes: [] };
+    const { _id, active, emailActive, role, scopes }: ISearchUser = context.jwt
+      ? await this.getUserRoleScopes(payload)
+      : {
+          _id: '',
+          active: false,
+          emailActive: false,
+          role: { _id: '', _key: '', level: 9 },
+          scopes: [],
+        };
 
-    request.http.headers.set('x-user-id', payload['sub']);
+    request.http.headers.set(
+      'x-user',
+      JSON.stringify({ _id, active, emailActive }),
+    );
+    request.http.headers.set('x-role', JSON.stringify(role));
     request.http.headers.set(
       'x-scopes',
-      scopes.map((scope) => scope.name).join(','),
+      scopes.map((scope: any) => scope.name).join(','),
     );
   }
 
@@ -72,10 +82,10 @@ export class AuthenticatedDataSource extends RemoteGraphQLDataSource {
     return verify(context.jwt, this.configService.get<string>('jwt.secret'));
   }
 
-  private async getUserScopes(
+  private async getUserRoleScopes(
     payload: Record<string, any> | string,
-  ): Promise<IScopes> {
-    return await this.authService.searchUserScopes({
+  ): Promise<ISearchUser> {
+    return await this.authService.searchUserRoleScopes({
       _id: payload['sub'],
     });
   }

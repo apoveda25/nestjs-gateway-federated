@@ -3,21 +3,29 @@ syntax = "proto3";
 package auth;
 
 service AuthService {
-  rpc searchUserScopes (UserId) returns (Scopes) {}
+  rpc searchUserRoleScopes (UserId) returns (User) {}
 }
 
 message UserId {
   string _id = 1;
 }
 
+message User {
+  string _id = 1;
+  bool active = 2;
+  bool emailActive = 3;
+  Role role = 4;
+  repeated Scope scopes = 5;
+}
+
+message Role {
+  string _id = 1;
+  string _key = 2;
+  int32 level = 3;
+}
+
 message Scope {
   string _id = 1;
   string _key = 2;
   string name = 3;
-  string action = 4;
-  string collection = 5;
-}
-
-message Scopes {
-  repeated Scope scopes = 1;
 }

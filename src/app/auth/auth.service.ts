@@ -1,10 +1,7 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
 import { GraphQLError } from 'graphql';
-import {
-  IAuthServiceGrpc,
-  ISearchUserScopes,
-} from './interfaces/auth-service.interface';
+import { IAuthServiceGrpc, IUserId } from './interfaces/auth-service.interface';
 
 @Injectable()
 export class AuthService implements OnModuleInit {
@@ -18,10 +15,10 @@ export class AuthService implements OnModuleInit {
     );
   }
 
-  async searchUserScopes(searchUserScopes: ISearchUserScopes) {
+  async searchUserRoleScopes(userId: IUserId) {
     try {
       return await this.authServiceGrpc
-        .searchUserScopes(searchUserScopes)
+        .searchUserRoleScopes(userId)
         .toPromise();
     } catch (error) {
       console.log(error);

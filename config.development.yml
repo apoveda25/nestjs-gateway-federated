@@ -10,6 +10,7 @@ jwt:
 
 gateway:
   # key: service:farmaco-graphql-51ak3d:eyCOxLniIshEQrOp0xyQKQ
+  # graphRef: farmaco-graphql-51ak3d@current
   debug: true
   serviceHealthCheck: false
   services:

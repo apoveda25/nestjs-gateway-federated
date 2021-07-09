@@ -41,12 +41,6 @@ class ApolloServices {
   url: string;
 }
 
-// class ApolloVariables {
-//   @IsString()
-//   @IsOptional()
-//   key?: string;
-// }
-
 class GatewayVariables {
   @IsString()
   @IsOptional()
@@ -69,9 +63,6 @@ class EnvironmentVariables {
 
   @ValidateNested({ each: true })
   jwt: JWTVariables;
-
-  // @ValidateNested({ each: true })
-  // apollo: ApolloVariables;
 
   @ValidateNested({ each: true })
   gateway: GatewayVariables;

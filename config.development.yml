@@ -9,7 +9,8 @@ jwt:
   expiresIn: '6h'
 
 gateway:
-  # key: service:farmaco-graphql-51ak3d:eyCOxLniIshEQrOp0xyQKQ
+  key: service:farmaco-graphql-51ak3d:eyCOxLniIshEQrOp0xyQKQ
+  graphRef: farmaco-graphql-51ak3d@current
   debug: true
   serviceHealthCheck: false
   services:

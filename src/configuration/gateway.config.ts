@@ -105,12 +105,15 @@ export const gatewayConfigFactory = async (
   return {
     gateway,
     server: {
-      context: ({ req }) => {
-        if (!req.headers.authorization) return { jwt: null };
+      transformAutoSchemaFile: true,
+      introspection: true,
+      sortSchema: true,
+      context: ({ request }) => {
+        if (!request.headers.authorization) return { jwt: null };
 
-        if (req.headers.authorization.includes('Bearer '))
+        if (request.headers.authorization.includes('Bearer '))
           return {
-            jwt: req.headers.authorization.replace('Bearer ', ''),
+            jwt: request.headers.authorization.replace('Bearer ', ''),
           };
 
         throw new GraphQLError('Token bearer is bad.');

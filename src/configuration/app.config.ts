@@ -19,5 +19,8 @@ export default () => {
 
   if (config.gateway.key) process.env.APOLLO_KEY = config.gateway.key;
 
+  if (config.gateway.graphRef)
+    process.env.APOLLO_GRAPH_REF = config.gateway.graphRef;
+
   return config;
 };
